@@ -13,7 +13,7 @@ FIREFLYIII_INSTANCE = os.environ["FIREFLYIII_INSTANCE"]
 FIREFLYIII_TOKEN = os.environ["FIREFLYIII_TOKEN"]
 FIREFLYIII_PORT = os.environ["FIREFLYIII_PORT"]
 MONOBANK_TOKEN = os.environ["MONOBANK_TOKEN"]
-
+TIMEZONE = os.environ["TIMEZONE"]
 
 CURRENCIES = {
     971: "AFN",
@@ -149,7 +149,7 @@ def monoToFireflyiiiTransaction(transaction, account, categories = {"budget_id":
     transactionType = "withdrawal" if transaction["amount"] < 0 else "deposit"
 
     transactionTime = transaction["time"]
-    timezone = zoneinfo.ZoneInfo(key="Europe/Kyiv")
+    timezone = zoneinfo.ZoneInfo(key=TIMEZONE)
     ctime = datetime.fromtimestamp(transactionTime, timezone).strftime("%Y-%m-%dT%H:%M:%S%z")
     ftime = ctime[:-2] + ":" + ctime[-2:]
 
