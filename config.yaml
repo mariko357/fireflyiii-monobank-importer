@@ -1,0 +1,15 @@
+MonobankAccounts:
+  -
+    - accountName: "black"
+    - monoID: "yourId"
+    - fireflyAccountID: -1
+    - tags: []
+    - budgetID: -1
+    - categoryID: -1
+  -
+    - accountName: "white"
+    - monoID: "yourId"
+    - fireflyAccountID: -1
+    - tags: []
+    - budgetID: -1
+    - categoryID: -1
