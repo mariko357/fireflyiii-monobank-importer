@@ -231,14 +231,13 @@ if __name__ == "__main__":
                         details["budget_id"] = account["budgetID"]
                     if account["categoryID"] != -1:
                         details["category_id"] = account["categoryID"]
-                    
-                    print("Transactions = ", transactions)
 
                     for i in transactions:
                         converted.append(monoToFireflyiiiTransaction(i, account["fireflyAccountID"], details))
 
                     while database["lastTransactionTime"] + LAST_TRANSACTION_TIMEOUT > int(time()) and index + 1 != len(accountsConfig): sleep(1)
 
+                print("Transactions to be imported: ", converted)
                 for i in converted:
                     api.addTransaction([i])
 

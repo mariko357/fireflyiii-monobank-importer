@@ -41,3 +41,5 @@ To get monobank account id, run `curl -H 'X-Token: your-monobank-api-token' http
 To get id of account / budget / category in Fireflyiii, go to its edit page and look for the number in the address bar. (e.g. `http://fireflyinstance.xyz/accounts/edit/9` - id of this account is 9).
 
 4. Run `python main.py`
+
+## [Docker container](https://github.com/mariko357/fireflyiii-monobank-importer-docker)
