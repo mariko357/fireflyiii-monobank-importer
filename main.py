@@ -3,6 +3,7 @@ from fireflyiii import FireflyAPI
 import shelve
 from time import time, sleep
 from datetime import datetime
+import requests
 import zoneinfo
 import os
 import yaml
@@ -182,6 +183,15 @@ def monoToFireflyiiiTransaction(transaction, account, categories = {"budget_id":
     
     return fireflyTransaction
 
+def testInternentConnection(url = "https://google.com"):
+    try:
+        res = requests.get(url)
+        if res.status_code != 200:
+            return False
+    except:
+        return False
+    return True
+
 if __name__ == "__main__":
 
     print("Invoking the script;")
@@ -211,40 +221,43 @@ if __name__ == "__main__":
         print("First run, saving the time and Aborting.")
 
     else:
-        if (int(time()) - database["lastTransactionTime"] > LAST_TRANSACTION_TIMEOUT):
-            if api.testConnection():
-                
-                converted = []
-                for index, account in enumerate(accountsConfig):
+        if testInternentConnection():
+            if (int(time()) - database["lastTransactionTime"] > LAST_TRANSACTION_TIMEOUT):
+                if api.testConnection():
                     
-                    lastAccountStatement = database["lastAccountStatement"][account["accountName"]]
-                    now = int(time())
-                    database["lastAccountStatement"] = {**database["lastAccountStatement"], account["accountName"]: now}
+                    converted = []
+                    for index, account in enumerate(accountsConfig):
+                        
+                        lastAccountStatement = database["lastAccountStatement"][account["accountName"]]
+                        now = int(time())
+                        database["lastAccountStatement"] = {**database["lastAccountStatement"], account["accountName"]: now}
 
-                    transactions = monobank.getStatement(account["monoID"], lastAccountStatement, now)
-                    database["lastTransactionTime"] = int(time())
+                        transactions = monobank.getStatement(account["monoID"], lastAccountStatement, now)
+                        database["lastTransactionTime"] = int(time())
 
-                    details = {}
-                    if account["tags"] != []:
-                        details["tags"] = account["tags"]
-                    if account["budgetID"] != -1:
-                        details["budget_id"] = account["budgetID"]
-                    if account["categoryID"] != -1:
-                        details["category_id"] = account["categoryID"]
+                        details = {}
+                        if account["tags"] != []:
+                            details["tags"] = account["tags"]
+                        if account["budgetID"] != -1:
+                            details["budget_id"] = account["budgetID"]
+                        if account["categoryID"] != -1:
+                            details["category_id"] = account["categoryID"]
 
-                    for i in transactions:
-                        converted.append(monoToFireflyiiiTransaction(i, account["fireflyAccountID"], details))
+                        for i in transactions:
+                            converted.append(monoToFireflyiiiTransaction(i, account["fireflyAccountID"], details))
 
-                    while database["lastTransactionTime"] + LAST_TRANSACTION_TIMEOUT > int(time()) and index + 1 != len(accountsConfig): sleep(1)
+                        while database["lastTransactionTime"] + LAST_TRANSACTION_TIMEOUT > int(time()) and index + 1 != len(accountsConfig): sleep(1)
 
-                print("Transactions to be imported: ", converted)
-                for i in converted:
-                    api.addTransaction([i])
+                    print("Transactions to be imported: ", converted)
+                    for i in converted:
+                        api.addTransaction([i])
 
+                else:
+                    print("Could not connect to a Firefly API; Aborting.")
+        
             else:
-                print("Could not connect to a Firefly API; Aborting.")
-    
+                print("Last transaction was less than a specified timeout; Aborting.")
         else:
-            print("Last transaction was less than a specified timeout; Aborting.")
+            print("No internet connection; Aborting.")
 
     database.close()
