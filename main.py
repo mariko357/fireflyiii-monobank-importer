@@ -272,11 +272,13 @@ if __name__ == "__main__":
             accountsConfig[index] = {**accountsConfig[index], **j}
 
     if not "lastTransactionTime" in database:
-        database["lastTransactionTime"] = int(time()) - 3600
+        print("First run, please enter the time in epoch format from which to import the transactions:")
+        timeFrom = int(input())
+        database["lastTransactionTime"] = timeFrom
         database["lastAccountStatement"] = {}
         for i in accountsConfig:
-            database["lastAccountStatement"] = {**database["lastAccountStatement"], **{i["accountName"]: int(time()) - 3600}}
-        print("First run, saving the time and Aborting.")
+            database["lastAccountStatement"] = {**database["lastAccountStatement"], **{i["accountName"]: timeFrom}}
+        print("Thank you!")
 
     else:
         if testInternentConnection():
